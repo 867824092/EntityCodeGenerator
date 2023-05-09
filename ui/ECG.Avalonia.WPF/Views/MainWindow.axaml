@@ -13,6 +13,7 @@
         x:Class="ECG.Avalonia.WPF.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
+		Title="实体代码生成器"
         >
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
