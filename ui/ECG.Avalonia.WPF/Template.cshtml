@@ -1,0 +1,18 @@
+﻿@using ECG.Contracts
+@inherits RazorViewTemplateEngine.Core.RazorViewPage<TableStructure>
+using System;
+namespace @Model.NameSpace
+{
+    public class @Model.TableName
+    {
+        @foreach (var pm in  Model.Columns)
+        {
+           @if(pm.IsCanNull)
+           {
+           @:public @pm.ColumnType? @pm.ColumnName { get; set;}
+           }else{
+           @:public @pm.ColumnType @pm.ColumnName { get; set;}
+           }
+        }
+    }
+}

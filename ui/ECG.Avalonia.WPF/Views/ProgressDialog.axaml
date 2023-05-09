@@ -1,0 +1,35 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ECG.Avalonia.WPF.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             x:Class="ECG.Avalonia.WPF.Views.ProgressDialog"
+             x:DataType="vm:ProgressViewModel"
+             Height="200" Width="200">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ProgressViewModel/>
+    </Design.DataContext>
+    <StackPanel   VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar Classes="circular no-transitions" Value="{Binding ProgressValue,Mode=TwoWay}" />
+                <Button Margin="0 16 0 0"
+                        IsEnabled="{Binding !IsRunning,Mode=TwoWay}"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor,
+                         AncestorType=dialogHost:DialogHost}, Path=CloseDialogCommand}"
+                        CommandParameter="ok">
+                    确认
+                </Button>
+                <Button Margin="0 16 0 0"
+                        IsEnabled="{Binding IsRunning,Mode=TwoWay}"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor,
+                         AncestorType=dialogHost:DialogHost}, Path=CloseDialogCommand}"
+                        CommandParameter="cancel">
+                    取消
+                </Button>
+        </StackPanel>
+    
+</UserControl>

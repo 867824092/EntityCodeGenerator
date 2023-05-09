@@ -1,0 +1,106 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ECG.Avalonia.WPF.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
+        xmlns:wpf="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="560"
+        Width="800" Height="560" MinWidth="800" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        x:Class="ECG.Avalonia.WPF.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        >
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
+        <Panel>
+        <Grid Margin="10" RowDefinitions="80,50,*,10">
+            <controls:Card Grid.Row="0" Margin="0,0,0,5" Padding="5">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border BorderBrush="#67C23A" BorderThickness="2"  CornerRadius="10" ></Border>
+                    <TextBlock VerticalAlignment="Center" Margin="10 0 0 0" Classes="Subtitle2" >
+                        数据库类型:
+                    </TextBlock>
+                    <ComboBox Classes="Outline"  Items="{Binding DatabaseTypes}"
+                              SelectedItem="{Binding DatabaseSelectItem}"
+                              SelectedIndex="0"
+                              Margin="10 0 10 10">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Value}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </controls:Card>
+            <controls:Card Grid.Row="1" Margin="0,0,0,5" Padding="5">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border BorderBrush="#67C23A" BorderThickness="2"  CornerRadius="10" ></Border>
+                    <TextBlock VerticalAlignment="Center" Margin="10 0 10 0" Classes="Subtitle2" Text="数据库连接字符串:" />
+                    <TextBox UseFloatingWatermark="False" 
+                             Width="500" Watermark="数据库连接字符串" 
+                             Text="{Binding ConnectionString,Mode=TwoWay}"/>
+                    <Button Classes="Outline Accent" 
+                            Content="查找" 
+                            Command="{Binding SearchTables}"
+                            Margin="10 0 0 0" 
+                            />
+                </StackPanel>
+            </controls:Card>
+            <controls:Card Grid.Row="2">
+                 <Grid ColumnDefinitions="*,*">
+                     <DataGrid Grid.Column="0" x:Name="dataGrid"
+                               ColumnWidth="*"
+                               BorderBrush="LightGray" BorderThickness="1"
+                               Items="{Binding Tables}"
+                               AutoGenerateColumns="False"
+                               CanUserSortColumns="False"
+                               CanUserResizeColumns="False"
+                               GridLinesVisibility="All"
+                               Margin="6">
+                          <DataGrid.Columns>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <!-- <CheckBox x:Name="headCheckBox" Content="表名称" -->
+                                        <!--           IsThreeState="False"/> -->
+                                        <TextBlock HorizontalAlignment="Center" 
+                                                   Classes="Subtitle2" Text="表名称" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Margin="10 0 0 0"
+                                                  Classes="Accent" IsChecked="{Binding IsChecked}"
+                                                  Content="{Binding Name}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                          </DataGrid.Columns>
+                        </DataGrid>
+                         <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto">
+                             <TextBox Grid.Row="0" Margin="10" Height="35" Text="{Binding NameSpace}"
+                                      Watermark="命名空间" ></TextBox>
+                             <Grid Grid.Row="1" ColumnDefinitions="*,5,60" Margin="10">
+                                 <TextBox Grid.Column="0" UseFloatingWatermark="False" Height="35" 
+                                         Watermark="保存路径" Text="{Binding SavePath,Mode=TwoWay}"/>
+                                 <Button Grid.Column="2" Classes="Outline" x:Name="Btn_Folder"
+                                         Click="Btn_Folder_OnClick">浏览</Button>
+                             </Grid>
+                             <DockPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                 <Button Classes="Outline" x:Name="Btn_Save" Click="Btn_Save_OnClick">生成</Button>
+                             </DockPanel>
+                         </Grid>
+                </Grid>
+            </controls:Card>
+        </Grid>
+    </Panel>
+    </dialogHostAvalonia:DialogHost>
+</Window>
