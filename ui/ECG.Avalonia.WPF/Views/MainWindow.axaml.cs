@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using DialogHostAvalonia;
 using ECG.Avalonia.WPF.Models;
@@ -26,13 +27,17 @@ public partial class MainWindow : Window {
         InitializeComponent();
     }
     private async void Btn_Folder_OnClick(object? sender, RoutedEventArgs e) {
-        var dialog = new OpenFolderDialog();
-        var result = await dialog.ShowAsync(this);
-        if (string.IsNullOrEmpty(result)) return;
-        VM.SavePath = result;
+        var folderPickerOpenOptions = new FolderPickerOpenOptions()
+        {
+        //AllowMultiple = false
+        };
+        var result = await StorageProvider.OpenFolderPickerAsync(folderPickerOpenOptions);
+        if (result.Count == 0) return;
+        
+        VM.SavePath = result[0].TryGetLocalPath();
     }
 
-    private void Btn_Save_OnClick(object? sender, RoutedEventArgs e) {
+    private async void Btn_Save_OnClick(object? sender, RoutedEventArgs e) {
         if (VM.Tables.Count == 0) {
             DialogHelper.ShowTipDialog("Please select tables   ", this);
             return;
@@ -48,33 +53,37 @@ public partial class MainWindow : Window {
             return;
         }
         FileHepler.CreateDirectoryIfNotExists(VM.SavePath);
-        var dialog = App.ServiceProvider!.GetRequiredService<ProgressDialog>(); 
+        var dialog = App.ServiceProvider!.GetRequiredService<ProgressDialog>();
         DialogHost.Show(dialog, Constants.MainDialogHost, delegate(object o,
             DialogClosingEventArgs args) {
             if (args.Parameter?.ToString() == "cancel") {
                 dialog.CancellationTokenSource.Cancel();
             }
+
             dialog.Dispose();
         });
-        var databaseApi =
-            DatabaseApiFactory.CreateDatabaseApi(VM.ConnectionString!, VM.DatabaseSelectItem!.Value.Key);
-        var progressViewModel = dialog.DataContext as ProgressViewModel;
-        string path = VM.SavePath;
-        foreach (TablesSelection tablesSelection in VM.Tables.Where(u => u.IsChecked)) {
-            try {
-                progressViewModel!.Tasks.Add(databaseApi!.QueryTableDescriptionAsync(tablesSelection.Name!,
-                        VM.NameSpace,
-                        dialog.Token)
-                    .ContinueWith(async obj => {
-                        var result = await RazorEngine.CompileGenericAsync(Constants.TemplatePath, obj.Result);
-                        await FileHepler.CreateFileIfNotExistsAsync(
-                            Path.Combine(path!, $"{tablesSelection.Name}.cs"), result);
-                        await dialog.Enqueue(1);
-                    }, dialog.Token));
-            }
-            catch {
-                break;
-            }
-        }
+        await Task.Delay(500).ContinueWith(state => 
+            Dispatcher.UIThread.InvokeAsync(() => {
+                var databaseApi =
+                    DatabaseApiFactory.CreateDatabaseApi(VM.ConnectionString!, VM.DatabaseSelectItem!.Value.Key);
+                var progressViewModel = dialog.DataContext as ProgressViewModel;
+                string path = VM.SavePath;
+                foreach (TablesSelection tablesSelection in VM.Tables.Where(u => u.IsChecked)) {
+                    try {
+                        progressViewModel!.Tasks.Add(databaseApi!.QueryTableDescriptionAsync(tablesSelection.Name!,
+                                VM.NameSpace,
+                                dialog.Token)
+                            .ContinueWith(async obj => {
+                                var result = await RazorEngine.CompileGenericAsync(Constants.TemplatePath, obj.Result);
+                                await FileHepler.CreateFileIfNotExistsAsync(
+                                    Path.Combine(path!, $"{tablesSelection.Name}.cs"), result);
+                                await dialog.Enqueue(1);
+                            }, dialog.Token));
+                    }
+                    catch {
+                        break;
+                    }
+                }
+            }));
     }
 }

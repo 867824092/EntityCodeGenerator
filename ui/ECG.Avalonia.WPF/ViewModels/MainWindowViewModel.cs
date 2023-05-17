@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
+using Avalonia.Threading;
 using DialogHostAvalonia;
 using DynamicData;
 using ECG.Avalonia.WPF.Models;
@@ -81,23 +82,27 @@ public class MainWindowViewModel : ViewModelBase {
                 App.ServiceProvider!.GetRequiredService<MainWindow>());
             return;
         }
-        try {
-            DialogHelper.ShowMaskDialog();
-            var database =
-                DatabaseApiFactory.CreateDatabaseApi(ConnectionString, DatabaseSelectItem!.Value.Key);
-            var tables = await database!.QueryAllTablesNameAsync();
-            Tables.Clear();
-            Tables.AddRange(tables.Select(u => new TablesSelection()
-            { Name = u,
-              IsChecked = true }));
-        }
-        catch (Exception ex) {
-            DialogHelper.ShowErrorDialog(ex.Message, ex,
-                App.ServiceProvider!.GetRequiredService<MainWindow>());
-        }
-        finally {
-            DialogHelper.CloseDialog();
-        }
+        DialogHelper.ShowMaskDialog();
+        await Task.Delay(200).ContinueWith(async obj => {
+            try {
+                var database =
+                    DatabaseApiFactory.CreateDatabaseApi(ConnectionString, DatabaseSelectItem!.Value.Key);
+                var tables = await database!.QueryAllTablesNameAsync();
+                Dispatcher.UIThread.Invoke(() => {
+                    Tables.Clear();
+                    Tables.AddRange(tables.Select(u => new TablesSelection()
+                    { Name = u,
+                      IsChecked = true }));
+                });
+            }
+            catch (Exception ex) {
+                Dispatcher.UIThread.Invoke(() => {
+                    DialogHelper.ShowErrorDialog(ex.Message, ex,
+                        App.ServiceProvider!.GetRequiredService<MainWindow>());
+                });
+            }
+        });
+        await Task.Delay(100).ContinueWith(obj=>Dispatcher.UIThread.Invoke(()=>DialogHelper.CloseDialog()));
     }
     #endregion
 
