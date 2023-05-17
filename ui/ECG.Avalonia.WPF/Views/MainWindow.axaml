@@ -13,23 +13,25 @@
         x:Class="ECG.Avalonia.WPF.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-		Title="实体代码生成器"
-        >
+        Title="实体代码生成器"
+>
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-    <dialogHostAvalonia:DialogHost Identifier="MainDialogHost">
+    <dialogHostAvalonia:DialogHost Identifier="MainDialogHost" Background="Transparent">
         <Panel>
-        <Grid Margin="10" RowDefinitions="80,50,*,10">
+        <Grid Margin="10" RowDefinitions="80,75,*,10">
             <controls:Card Grid.Row="0" Margin="0,0,0,5" Padding="5">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Border BorderBrush="#67C23A" BorderThickness="2"  CornerRadius="10" ></Border>
                     <TextBlock VerticalAlignment="Center" Margin="10 0 0 0" Classes="Subtitle2" >
                         数据库类型:
                     </TextBlock>
-                    <ComboBox Classes="Outline"  Items="{Binding DatabaseTypes}"
+                    <ComboBox Classes="Outline"
+                              wpf:ComboBoxAssist.Label="类型"
+                               ItemsSource="{Binding DatabaseTypes}"
                               SelectedItem="{Binding DatabaseSelectItem}"
                               SelectedIndex="0"
                               Margin="10 0 10 10">
@@ -45,13 +47,14 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Border BorderBrush="#67C23A" BorderThickness="2"  CornerRadius="10" ></Border>
                     <TextBlock VerticalAlignment="Center" Margin="10 0 10 0" Classes="Subtitle2" Text="数据库连接字符串:" />
-                    <TextBox UseFloatingWatermark="False" 
-                             Width="500" Watermark="数据库连接字符串" 
+                    <TextBox Classes="outline" UseFloatingWatermark="False"
+                             Width="500" Watermark="数据库连接字符串"
                              Text="{Binding ConnectionString,Mode=TwoWay}"/>
-                    <Button Classes="Outline Accent" 
-                            Content="查找" 
+                    <Button Classes="Outline Accent"
+                            Height="30"
+                            Content="查找"
                             Command="{Binding SearchTables}"
-                            Margin="10 0 0 0" 
+                            Margin="10 0 0 0"
                             />
                 </StackPanel>
             </controls:Card>
@@ -60,7 +63,7 @@
                      <DataGrid Grid.Column="0" x:Name="dataGrid"
                                ColumnWidth="*"
                                BorderBrush="LightGray" BorderThickness="1"
-                               Items="{Binding Tables}"
+                               ItemsSource="{Binding Tables}"
                                AutoGenerateColumns="False"
                                CanUserSortColumns="False"
                                CanUserResizeColumns="False"
@@ -72,7 +75,7 @@
                                     <DataTemplate>
                                         <!-- <CheckBox x:Name="headCheckBox" Content="表名称" -->
                                         <!--           IsThreeState="False"/> -->
-                                        <TextBlock HorizontalAlignment="Center" 
+                                        <TextBlock HorizontalAlignment="Center"
                                                    Classes="Subtitle2" Text="表名称" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.HeaderTemplate>
@@ -87,12 +90,12 @@
                           </DataGrid.Columns>
                         </DataGrid>
                          <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto">
-                             <TextBox Grid.Row="0" Margin="10" Height="35" Text="{Binding NameSpace}"
+                             <TextBox Grid.Row="0" Classes="outline" Margin="10" Height="60" Text="{Binding NameSpace}"
                                       Watermark="命名空间" ></TextBox>
                              <Grid Grid.Row="1" ColumnDefinitions="*,5,60" Margin="10">
-                                 <TextBox Grid.Column="0" UseFloatingWatermark="False" Height="35" 
+                                 <TextBox Grid.Column="0" Classes="outline" UseFloatingWatermark="False" Height="65"
                                          Watermark="保存路径" Text="{Binding SavePath,Mode=TwoWay}"/>
-                                 <Button Grid.Column="2" Classes="Outline" x:Name="Btn_Folder"
+                                 <Button Grid.Column="2" Classes="Outline" Height="30" x:Name="Btn_Folder"
                                          Click="Btn_Folder_OnClick">浏览</Button>
                              </Grid>
                              <DockPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">
