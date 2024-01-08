@@ -7,11 +7,27 @@ namespace @Model.NameSpace
     {
         @foreach (var pm in  Model.Columns)
         {
-           @if(pm.IsCanNull)
-           {
-           @:public @pm.ColumnType? @pm.ColumnName { get; set;}
-           }else{
-           @:public @pm.ColumnType @pm.ColumnName { get; set;}
+        @:///<summary>
+        @:///@pm.Comment
+        @:///</summary>
+ @if(pm.IsCanNull)
+ {
+   @:public @pm.ColumnType? @pm.ColumnName { get; set;}  = string.Empty;
+ }
+ else
+ {
+    @if (pm.ColumnType == "string")
+    {   
+        @:public @pm.ColumnType @pm.ColumnName { get; set;}  = string.Empty;
+    }
+    else if (pm.ColumnType == "DateTime")
+    {
+        @:public @pm.ColumnType @pm.ColumnName { get; set;}  = DateTime.Now;
+    }
+    else
+    {
+        @:public @pm.ColumnType @pm.ColumnName { get; set; }
+    }
            }
         }
     }
