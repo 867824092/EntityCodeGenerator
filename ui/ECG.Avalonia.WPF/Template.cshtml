@@ -1,6 +1,7 @@
 ﻿@using ECG.Contracts
 @inherits RazorViewTemplateEngine.Core.RazorViewPage<TableStructure>
 using System;
+using System.ComponentModel;
 namespace @Model.NameSpace
 {
     public class @Model.TableName
@@ -10,6 +11,7 @@ namespace @Model.NameSpace
         @:///<summary>
         @:///@pm.Comment
         @:///</summary>
+        @:[Description("@pm.Comment")]
  @if(pm.IsCanNull)
  {
    @:public @pm.ColumnType? @pm.ColumnName { get; set;}  = string.Empty;
